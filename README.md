@@ -17,10 +17,10 @@ Com este projeto, você pode aproveitar todas as funcionalidades da CLI da Magal
 
 #### Passo 1: Baixar a Imagem Docker
 
-Para baixar a imagem `codeinloop.com.br/docker-magalucloud-cli` do Docker Hub, abra um terminal e execute o seguinte comando:
+Para baixar a imagem `danilodorgam/docker-magalucloud-cli` do Docker Hub, abra um terminal e execute o seguinte comando:
 
 ```bash
-docker run -it --rm codeinloop/docker-magalucloud-cli
+docker run -it --rm danilodorgam/docker-magalucloud-cli
 ```
 #### Passo 2 (opcional): Construa o Contêiner: Execute o comando de construção para criar a imagem Docker
 
