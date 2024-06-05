@@ -25,6 +25,7 @@ container_scanning:
     GIT_STRATEGY: fetch
     SECURE_LOG_LEVEL: 'error'
     CS_SEVERITY_THRESHOLD: 'LOW'
+  when: on_success
   allow_failure: false
 
 publish:
