@@ -1,5 +1,11 @@
+include:
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
 stages:
   - build
+  - scanner
+  - publish
+  - afterScanner
 
 build:
   image: docker:latest
@@ -9,7 +15,35 @@ build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+container_scanning:
+  stage: scanner
+  variables:
+    CS_DEFAULT_BRANCH_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  allow_failure: false
+
+publish:
+  image: docker:latest
+  stage: publish
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker pull "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" "$CI_REGISTRY_IMAGE:latest"
+    - docker tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
   only:
-    - main
+    - tags
+  when: on_success
+
+afterScanner:
+  image: curl:latest
+  stage: afterScanner
+  script:
+    - curl -u $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD -X "DELETE" https://cloud.docker.com/v2/repositories/$CI_REGISTRY_USER/$CI_REGISTRY_NAME/tags/$CI_COMMIT_SHA
+  when: always
