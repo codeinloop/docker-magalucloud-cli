@@ -45,7 +45,7 @@ publish:
   when: on_success
 
 afterScanner:
-  image: curl:latest
+  image: curlimages/curl
   stage: afterScanner
   script:
     - curl -u $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD -X "DELETE" https://cloud.docker.com/v2/repositories/$CI_REGISTRY_USER/$CI_REGISTRY_NAME/tags/$CI_COMMIT_SHA
