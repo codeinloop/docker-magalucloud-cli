@@ -21,7 +21,7 @@ build:
 container_scanning:
   stage: scanner
   variables:
-    CS_DEFAULT_BRANCH_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    CS_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   allow_failure: false
 
 publish:
